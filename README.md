@@ -93,6 +93,10 @@ python gradio_demo.py
 python webcam_gradio_demo.py
 ```
 
+```bash
+python video.py --path [VIDEO_PATH]
+```
+
 **Limitations**
 
 * The model may generate inaccurate statements, and struggle to understand intricate or nuanced instructions.

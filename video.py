@@ -49,7 +49,7 @@ def answer_question(img, prompt):
         buffer += clean_text
         yield buffer.strip("<END")
 
-video_path = args.video_path
+video_path = args.path
 cap = cv2.VideoCapture(video_path)
 frame_interval = 5  # Feed image every 5 seconds
 last_answer_time = 0
