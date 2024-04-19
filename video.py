@@ -60,22 +60,37 @@ prompt = "What's going on? Respond with a single sentence."
 cyan_color = "\033[96m"
 reset_color = "\033[0m"
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+should_stop = False
 
-    current_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
-    if current_time - last_answer_time >= frame_interval:
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        pil_img = Image.fromarray(img)
-        answer = None
-        for text in answer_question(pil_img, prompt):
-            answer = text
-        if answer is not None:
-            print(f"{cyan_color}{answer}{reset_color}")
-            last_answer_time = current_time
+def process_frames():
+    global last_answer_time
+    while not should_stop:
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-    time.sleep(0.1)
+        current_time = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+        if current_time - last_answer_time >= frame_interval:
+            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (640, 480))  # Resize the image to a smaller size
+            pil_img = Image.fromarray(img)
+            answer = None
+            for text in answer_question(pil_img, prompt):
+                answer = text
+            if answer is not None:
+                print(f"{cyan_color}{answer}{reset_color}")
+                last_answer_time = current_time
+
+        time.sleep(0.01)  # Adjust the sleep time based on the processing time
+
+try:
+    process_thread = Thread(target=process_frames)
+    process_thread.start()
+
+    while process_thread.is_alive():
+        process_thread.join(timeout=1.0)
+except KeyboardInterrupt:
+    should_stop = True
+    process_thread.join()
 
 cap.release()
